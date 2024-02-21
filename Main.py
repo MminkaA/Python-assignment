@@ -77,3 +77,5 @@ def main():
 
     rent_service.save_items_to_csv("items.csv")
 
+if __name__ == "__main__":
+    main()

@@ -1,6 +1,7 @@
 import json
 import csv
 
+
 class Item:
     def __init__(self, name, description, price, availability=True):
         self.name = name
@@ -8,7 +9,8 @@ class Item:
         self.price = price
         self.availability = availability
 
-class RentService:
+
+class ItemService:
     def __init__(self):
         self.items = []
 
@@ -22,11 +24,14 @@ class RentService:
                 found_items.append(item)
         return found_items
 
+    def delete_item(self, item_name):
+        self.items = [item for item in self.items if item.name != item_name]
+
     def save_items_to_json(self, filename):
         items_data = []
         for item in self.items:
             items_data.append({"name": item.name, "description": item.description, "price": item.price,
-                                "availability": item.availability})
+                               "availability": item.availability})
         with open(filename, "w") as json_file:
             json.dump(items_data, json_file, indent=4)
 
@@ -37,12 +42,15 @@ class RentService:
             for item in self.items:
                 writer.writerow([item.name, item.description, item.price, item.availability])
 
-def display_menu():
-    print("1. Add item for rent")
-    print("2. Search for items")
-    print("3. Exit")
 
-def rent_giver_menu(rent_service):
+def display_menu():
+    print("\n1. Add item")
+    print("2. Search for items")
+    print("3. Delete an item")
+    print("4. Exit")
+
+
+def item_giver_menu(item_service):
     while True:
         display_menu()
         choice = input("Enter your choice: ")
@@ -52,11 +60,11 @@ def rent_giver_menu(rent_service):
             price = float(input("Enter item price: "))
             availability = input("Is the item available? (yes/no): ").lower() == 'yes'
             item = Item(name, description, price, availability)
-            rent_service.add_item(item)
+            item_service.add_item(item)
             print("Item added successfully!")
         elif choice == '2':
             keyword = input("Enter keyword to search for items: ")
-            found_items = rent_service.find_item(keyword)
+            found_items = item_service.find_item(keyword)
             if found_items:
                 print("Found items matching your search:")
                 for item in found_items:
@@ -65,17 +73,23 @@ def rent_giver_menu(rent_service):
             else:
                 print("No items found matching your search.")
         elif choice == '3':
+            item_name = input("Enter the name of the item you want to delete: ")
+            item_service.delete_item(item_name)
+            print(f"Item '{item_name}' deleted successfully!")
+        elif choice == '4':
             break
         else:
             print("Invalid choice. Please try again.")
 
+
 def main():
-    rent_service = RentService()
-    rent_giver_menu(rent_service)
+    item_service = ItemService()
+    item_giver_menu(item_service)
+    item_service.save_items_to_json("items.json")
+    item_service.save_items_to_csv("items.csv")
 
-    rent_service.save_items_to_json("items.json")
 
-    rent_service.save_items_to_csv("items.csv")
-
+if __name__ == "__main__":
+    main()
 if __name__ == "__main__":
     main()
